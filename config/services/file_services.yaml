@@ -1,0 +1,10 @@
+services:
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+  App\Service\File\FileServiceInterface: '@App\Service\File\FileService'
+
+  App\Service\File\Uploader\FileUploader:
+    arguments:
+      $publicDirectory: '%kernel.project_dir%/var/storage/%kernel.environment%'

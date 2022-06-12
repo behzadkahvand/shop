@@ -1,0 +1,68 @@
+doctrine:
+    dbal:
+        driver: pdo_mysql
+        options:
+            # PDO::MYSQL_ATTR_INIT_COMMAND
+#            1002: "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))"
+        url: '%env(resolve:DATABASE_URL)%'
+        types:
+            geometry: LongitudeOne\Spatial\DBAL\Types\GeometryType
+            point: LongitudeOne\Spatial\DBAL\Types\Geometry\PointType
+            polygon: LongitudeOne\Spatial\DBAL\Types\Geometry\PolygonType
+            multipolygon: LongitudeOne\Spatial\DBAL\Types\Geometry\MultiPolygonType
+            linestring: LongitudeOne\Spatial\DBAL\Types\Geometry\LineStringType
+
+        # IMPORTANT: You MUST configure your server version,
+        # either here or in the DATABASE_URL env var (see .env file)
+        #server_version: '13'
+    orm:
+        auto_generate_proxy_classes: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        auto_mapping: true
+        mappings:
+            App:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Entity'
+                prefix: 'App\Entity'
+                alias: App
+        dql:
+            numeric_functions:
+                st_contains: LongitudeOne\Spatial\ORM\Query\AST\Functions\Standard\STContains
+                st_area: LongitudeOne\Spatial\ORM\Query\AST\Functions\Standard\STArea
+                st_geomfromtext: LongitudeOne\Spatial\ORM\Query\AST\Functions\Standard\StGeomFromText
+                st_intersects: LongitudeOne\Spatial\ORM\Query\AST\Functions\Standard\STIntersects
+                st_buffer: LongitudeOne\Spatial\ORM\Query\AST\Functions\MySql\SpBuffer
+                point: LongitudeOne\Spatial\ORM\Query\AST\Functions\MySql\SpPoint
+                rand: DoctrineExtensions\Query\Mysql\Rand
+            string_functions:
+                GROUP_CONCAT: DoctrineExtensions\Query\Mysql\GroupConcat
+                FIELD: DoctrineExtensions\Query\Mysql\Field
+                DATE_FORMAT: DoctrineExtensions\Query\Mysql\DateFormat
+                DATE: DoctrineExtensions\Query\Mysql\Date
+                IF: DoctrineExtensions\Query\Mysql\IfElse
+        filters:
+            inventoryIsActive:
+                class: App\Service\ORM\Filter\InventoryIsActiveFilter
+                enabled: false
+            productIsActive:
+                class: App\Service\ORM\Filter\ProductIsActiveFilter
+                enabled: false
+            inventoryHasStock:
+                class: App\Service\ORM\Filter\InventoryHasStockFilter
+                enabled: false
+            inventoryConfirmedStatus:
+                class: App\Service\ORM\Filter\InventoryConfirmedStatusFilter
+                enabled: false
+            softdeleteable:
+                class: Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter
+                enabled: true
+            productWaitingForAcceptStatus:
+                class: App\Service\ORM\Filter\ProductWaitingForAcceptStatusFilter
+                enabled: false
+            productWithTrashedStatus:
+                class: App\Service\ORM\Filter\ProductTrashedStatusFilter
+                enabled: false
+            ShipmentHasOrderItem:
+                class: App\Service\ORM\Filter\ShipmentHasOrderItemFilter
+                enabled: false

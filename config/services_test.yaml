@@ -1,0 +1,75 @@
+parameters:
+  env(APP_LOAD_FIXTURES): true
+  app.load_fixtures: '%env(bool:APP_LOAD_FIXTURES)%'
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    bind:
+      $irankishMerchantId: '%env(IRANKISH_GATEWAY_MERCHANT_ID)%'
+      $irankishSha1Key: '%env(IRANKISH_GATEWAY_SHA1KEY)%'
+      $samanMerchantId: '%env(SAMAN_GATEWAY_TERMINAL_ID)%'
+      $parsianMerchantId: '%env(PARSIAN_GATEWAY_MERCHANT_ID)%'
+      $vandarMerchantId: '%env(VANDAR_GATEWAY_MERCHANT_ID)%'
+      $cpgMerchantId: '%env(CPG_GATEWAY_MERCHANT_ID)%'
+      $mellatMerchantId: '%env(MELLAT_GATEWAY_MERCHANT_ID)%'
+      $mellatUsername: '%env(MELLAT_GATEWAY_USERNAME)%'
+      $mellatPassword: '%env(MELLAT_GATEWAY_PASSWORD)%'
+      $sadadTerminalId: '%env(SADAD_GATEWAY_TERMINAL_ID)%'
+      $sadadMerchantId: '%env(SADAD_GATEWAY_MERCHANT_ID)%'
+      $zibalMerchantId: '%env(ZIBAL_GATEWAY_MERCHANT_ID)%'
+      $zibalCODMerchantId: '%env(ZIBAL_COD_MERCHANT_ID)%'
+      $zibalCODSecretKey: '%env(ZIBAL_COD_SECRET_KEY)%'
+      $eFardaUsername: '%env(EFARDA_GATEWAY_USERNAME)%'
+      $eFardaPassword: '%env(EFARDA_GATEWAY_PASSWORD)%'
+      $eFardaServiceId: '%env(EFARDA_GATEWAY_SERVICE_ID)%'
+      $hamrahCardKey: '%env(HAMRAH_CARD_KEY)%'
+      $hamrahCardTerminalNumber: '%env(HAMRAH_CARD_GATEWAY_TERMINAL_NUMBER)%'
+      $hamrahCardSerialNumber: '%env(HAMRAH_CARD_GATEWAY_SERIAL_NUMBER)%'
+      $sadadKey: '%env(SADAD_GATEWAY_KEY)%'
+      $zibalGatewayUrl: '%env(ZIBAL_GATEWAY_URL)%'
+
+  App\Tests\Mock\:
+    resource: '../tests/Mock/*'
+
+  App\Service\Payment\Request\Purchase\IrankishPurchaseRequest: '@App\Tests\Mock\Service\Payment\Request\Purchase\MockedIranKishPurchaseRequest'
+  App\Service\Payment\Request\Verify\IrankishVerifyRequest: '@App\Tests\Mock\Service\Payment\Request\Verify\MockedIrankishVerifyRequest'
+
+  App\Service\Payment\Request\Purchase\ParsianPurchaseRequest: '@App\Tests\Mock\Service\Payment\Request\Purchase\MockedParsianPurchaseRequest'
+  App\Service\Payment\Request\Verify\ParsianVerifyRequest: '@App\Tests\Mock\Service\Payment\Request\Verify\MockedParsianVerifyRequest'
+
+  App\Service\Payment\Request\Purchase\SamanPurchaseRequest: '@App\Tests\Mock\Service\Payment\Request\Purchase\MockedSamanPurchaseRequest'
+  App\Service\Payment\Request\Verify\SamanVerifyRequest: '@App\Tests\Mock\Service\Payment\Request\Verify\MockedSamanVerifyRequest'
+
+  App\Service\Payment\Request\Purchase\CPGPurchaseRequest: '@App\Tests\Mock\Service\Payment\Request\Purchase\MockedCPGPurchaseRequest'
+  App\Service\Payment\Request\Verify\CPGVerifyRequest: '@App\Tests\Mock\Service\Payment\Request\Verify\MockedCPGVerifyRequest'
+
+  App\Service\Payment\Request\Purchase\SadadPurchaseRequest: '@App\Tests\Mock\Service\Payment\Request\Purchase\MockedSadadPurchaseRequest'
+  App\Service\Payment\Request\Verify\SadadVerifyRequest: '@App\Tests\Mock\Service\Payment\Request\Verify\MockedSadadVerifyRequest'
+
+  App\Service\Payment\Request\Purchase\ZibalPurchaseRequest: '@App\Tests\Mock\Service\Payment\Request\Purchase\MockedZibalPurchaseRequest'
+  App\Service\Payment\Request\Verify\ZibalVerifyRequest: '@App\Tests\Mock\Service\Payment\Request\Verify\MockedZibalVerifyRequest'
+
+  App\Service\Payment\Request\Purchase\COD\ZibalPurchaseRequest: '@App\Tests\Mock\Service\Payment\Request\Purchase\COD\MockedZibalPurchaseRequest'
+
+  App\Service\Payment\Request\Purchase\VandarPurchaseRequest: '@App\Tests\Mock\Service\Payment\Request\Purchase\MockedVandarPurchaseRequest'
+  App\Service\Payment\Request\Verify\VandarVerifyRequest: '@App\Tests\Mock\Service\Payment\Request\Verify\MockedVandarVerifyRequest'
+  App\Service\Payment\Request\Transaction\VandarTransactionRequest: '@App\Tests\Mock\Service\Payment\Request\MockedVandarTransactionRequest'
+
+  App\Service\Payment\Request\Purchase\MellatPurchaseRequest: '@App\Tests\Mock\Service\Payment\Request\Purchase\MockedMellatPurchaseRequest'
+  App\Service\Payment\Request\Verify\MellatVerifyRequest: '@App\Tests\Mock\Service\Payment\Request\Verify\MockedMellatVerifyRequest'
+  App\Service\Payment\Request\Transaction\MellatTransactionRequest: '@App\Tests\Mock\Service\Payment\Request\MockedMellatTransactionRequest'
+  App\Service\Payment\Request\Reverse\MellatReversalRequest: '@App\Tests\Mock\Service\Payment\Request\Reverse\MockedMellatReversalRequest'
+
+  App\Service\Payment\Request\Purchase\HamrahCardPurchaseRequest: '@App\Tests\Mock\Service\Payment\Request\Purchase\MockedHamrahCardPurchaseRequest'
+  App\Service\Payment\Request\Verify\HamrahCardVerifyRequest: '@App\Tests\Mock\Service\Payment\Request\Verify\MockedHamrahCardVerifyRequest'
+
+  App\Service\Payment\Request\Purchase\EFardaPurchaseRequest: '@App\Tests\Mock\Service\Payment\Request\Purchase\MockedEFardaPurchaseRequest'
+  App\Service\Payment\Request\Verify\EFardaVerifyRequest: '@App\Tests\Mock\Service\Payment\Request\Verify\MockedEFardaVerifyRequest'
+
+  App\EventSubscriber\Order\ReturnRequest\WorkflowRefundSubscriber: '@App\Tests\Integration\TestDoubles\Fakes\FakeWorkflowRefundSubscriber'
+  App\EventSubscriber\Order\ReturnRequest\WorkflowTransitionSubscriber: '@App\Tests\Integration\TestDoubles\Fakes\FakeWorkflowTransitionSubscriber'
+  App\EventSubscriber\Order\ReturnRequest\WorkflowEvaluateSubscriber: '@App\Tests\Integration\TestDoubles\Fakes\FakeWorkflowEvaluateSubscriber'
+
+  Symfony\Contracts\HttpClient\HttpClientInterface:
+    synthetic: true

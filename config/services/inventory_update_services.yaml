@@ -1,0 +1,13 @@
+services:
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+  PhpOffice\PhpSpreadsheet\Reader\Xlsx: ~
+
+  App\Service\Product\Seller\InventoryUpdate\InventoryUpdateSheetManager:
+    arguments:
+      $templateFilePath: '%kernel.project_dir%/resources/inventory_batch_update_template.xlsx'
+      $initializedDirPathPrefix: 'seller/uploads/inventory-batch/initialized'
+      $uploadedDirPathPrefix: 'seller/uploads/inventory-batch/uploaded'
+      $publicDir: '%kernel.project_dir%/var/storage/%kernel.environment%'

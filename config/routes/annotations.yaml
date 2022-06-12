@@ -1,0 +1,48 @@
+common_controllers:
+    resource: ../../src/Controller/Common/
+    type: annotation
+
+customer_controllers:
+    resource: ../../src/Controller/Customer/
+    type: annotation
+    name_prefix: customer.
+
+admin_controllers:
+    resource: ../../src/Controller/Admin/
+    type: annotation
+    prefix: /admin
+    name_prefix: admin.
+
+seller_controllers:
+    resource: ../../src/Controller/Seller/
+    type: annotation
+    prefix: /seller
+    name_prefix: seller.
+
+carrier_controllers:
+    resource: ../../src/Controller/Carrier/
+    type: annotation
+    prefix: /carrier
+    name_prefix: carrier.
+
+landing_controllers:
+    resource: ../../src/Controller/Landing/
+    type: annotation
+    prefix: /landing
+    name_prefix: landing.
+
+lendo_controllers:
+    resource: ../../src/Controller/Lendo/
+    type: annotation
+    prefix: /lendo
+    name_prefix: lendo.
+
+Monitoring_controllers:
+    resource: ../../src/Controller/Monitoring/
+    type: annotation
+    prefix: /monitoring
+    name_prefix: monitoring.
+
+kernel:
+    resource: ../../src/Kernel.php
+    type: annotation

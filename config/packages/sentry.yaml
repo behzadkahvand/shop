@@ -1,0 +1,7 @@
+sentry:
+    tracing:
+        enabled: false
+    dsn: '%env(SENTRY_DSN)%'
+    options:
+        integrations:
+            - 'Sentry\Integration\IgnoreErrorsIntegration'

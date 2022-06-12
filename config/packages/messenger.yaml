@@ -1,0 +1,212 @@
+framework:
+    messenger:
+        default_bus: command.bus
+        # Uncomment this (and the failed transport below) to send failed messages to this transport for later handling.
+        failure_transport: failures
+
+        transports:
+            # https://symfony.com/doc/current/messenger.html#transport-configuration
+             async:
+               dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+               serializer: 'app.messenger.transport.async_message_serializer'
+               retry_strategy:
+                 max_retries: 10
+                 delay: 2000
+               options:
+#                 queue_name: 'async'
+                 exchange:
+                   name: async
+                   type: direct
+                   default_publish_routing_key: normal
+                 queues:
+                   async_normal:
+                     binding_keys: [ normal ]
+             sync: 'sync://'
+             buy_box:
+               dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+               retry_strategy:
+                 max_retries: 10
+                 delay: 2000
+               options:
+#                 queue_name: 'buy_box'
+                 exchange:
+                   name: buy_box
+                   type: direct
+                   default_publish_routing_key: normal
+                 queues:
+                   buy_box_normal:
+                     binding_keys: [ normal ]
+             product_colors:
+               dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+               retry_strategy:
+                 max_retries: 10
+                 delay: 2000
+               options:
+#                 queue_name: 'product_colors'
+                 exchange:
+                   name: product_colors
+                   type: direct
+                   default_publish_routing_key: normal
+                 queues:
+                   product_colors_normal:
+                     binding_keys: [ normal ]
+
+             logger:
+               dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+               retry_strategy:
+                 max_retries: 10
+                 delay: 2000
+               options:
+#                 queue_name: 'logger'
+                 exchange:
+                   name: logger
+                   type: direct
+                   default_publish_routing_key: normal
+                 queues:
+                   logger_normal:
+                     binding_keys: [ normal ]
+
+             affiliator:
+               dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+               retry_strategy:
+                 max_retries: 10
+                 delay: 2000
+               options:
+#                 queue_name: 'affiliator'
+                 exchange:
+                   name: affiliator
+                   type: direct
+                   default_publish_routing_key: normal
+                 queues:
+                   affiliator_normal:
+                     binding_keys: [ normal ]
+
+             balance_amount:
+               dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+               retry_strategy:
+                 max_retries: 10
+                 delay: 2000
+               options:
+#                   queue_name: 'balance_amount'
+                 exchange:
+                   name: balance_amount
+                   type: direct
+                   default_publish_routing_key: normal
+                 queues:
+                   balance_amount_normal:
+                     binding_keys: [ normal ]
+
+             abandoned_cart_notification:
+               dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+               retry_strategy:
+                 max_retries: 10
+                 delay: 2000
+               options:
+#                   queue_name: 'abandoned_cart_notification'
+                 exchange:
+                   name: abandoned_cart_notification
+                   type: direct
+                   default_publish_routing_key: normal
+                 queues:
+                   abandoned_cart_notification_normal:
+                     binding_keys: [ normal ]
+
+             product_outsource_update:
+               dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+               retry_strategy:
+                 max_retries: 10
+                 delay: 2000
+               options:
+                 exchange:
+                   name: product_outsource_update
+                   type: direct
+                   default_publish_routing_key: normal
+                 queues:
+                   product_outsource_update_normal:
+                     binding_keys: [ normal ]
+
+             product_views:
+               dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+               retry_strategy:
+                 max_retries: 10
+                 delay: 2000
+               options:
+                 exchange:
+                   name: product_views
+                   type: direct
+                   default_publish_routing_key: normal
+                 queues:
+                   product_views_normal:
+                     binding_keys: [ normal ]
+
+             otp:
+               dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+               retry_strategy:
+                 max_retries: 10
+                 delay: 2000
+               options:
+                 exchange:
+                   name: otp
+                   type: direct
+                   default_publish_routing_key: normal
+                 queues:
+                   otp_normal:
+                     binding_keys: [ normal ]
+
+             elastic_product:
+               dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+               retry_strategy:
+                 max_retries: 10
+                 delay: 2000
+               options:
+                 exchange:
+                   name: elastic_product
+                   type: direct
+                   default_publish_routing_key: normal
+                 queues:
+                   elastic_product_normal:
+                     binding_keys: [ normal ]
+
+             failures:
+               dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+               options:
+                 queues:
+                   failed_messages:
+
+        routing:
+            # Route your messages to the transports
+          'App\Messaging\Messages\Command\AsyncMessage': async
+          'App\Messaging\Messages\Command\Product\AddBuyBoxToProduct': buy_box
+          'App\Messaging\Messages\Command\Product\LogInventoryPriceChange': logger
+          'App\Messaging\Messages\Command\Product\LogSearch': logger
+          'App\Messaging\Messages\Command\Order\SendOrderAffiliatorPurchaseRequest': affiliator
+          'App\Messaging\Messages\Command\Wallet\CreateWalletForUser': affiliator
+          'App\Messaging\Messages\Command\Order\ShipmentTrackingCodeUpdate': async
+          'App\Messaging\Messages\Command\Product\LogInventory': logger
+          'App\Messaging\Messages\Command\Order\AddBalanceAmountToOrder': balance_amount
+          'App\Messaging\Messages\Command\Seo\AddTitleAndMetaDescription': async
+          'App\Messaging\Messages\Command\Notification\AbandonedCart': abandoned_cart_notification
+          'App\Messaging\Messages\Command\Log\SmsNotificationLog': logger
+          'App\Messaging\Messages\Command\Log\SellerScoreUpdateMessage': logger
+          'App\Messaging\Messages\Command\Product\AddColorsToProduct': product_colors
+          'App\Messaging\Messages\Command\OrderItem\UpdateOrderItemFinalPrice': affiliator
+          'App\Messaging\Messages\Command\Product\UpdateFromOutsource': product_outsource_update
+          'App\Messaging\Messages\Command\Product\ImportDigikalaSellerProducts': product_outsource_update
+          'App\Messaging\Messages\Command\Product\BatchImportDigikalaProducts': product_outsource_update
+          'App\Messaging\Messages\Command\Product\ImportProductFromDigikala': product_outsource_update
+          'App\Messaging\Messages\Command\Product\ImportProductImagesFromDigikala': product_outsource_update
+          'App\Messaging\Messages\Command\Product\DownloadProductImageFromDigikala': product_outsource_update
+          'App\Messaging\Messages\Command\Product\IncreaseProductViewsCount': product_views
+          'App\Messaging\Messages\Command\Notification\OtpSmsNotification': otp
+          'App\Messaging\Messages\Command\ElasticSearch\ProductBatchMessage': elastic_product
+
+        buses:
+          command.bus:
+            middleware:
+              - doctrine_ping_connection
+              - doctrine_close_connection
+          event.bus:
+            default_middleware: allow_no_handlers
+            middleware:
+              - doctrine_ping_connection
+              - doctrine_close_connection

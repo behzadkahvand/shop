@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="midex" resname="max_inventory_discount_exceeded">
+			 	<source>max_inventory_discount_exceeded</source>
+				<target>No more than limit% discount on inventory is allowed.</target>
+            </trans-unit>
+            <trans-unit id="nid" resname="negative_inventory_discount">
+			 	<source>negative_inventory_discount</source>
+				<target>Negative discount on inventory is not allowed.</target>
+            </trans-unit>
+            <trans-unit id="ccifcp" resname="cannot_create_inventory_for_campaign_products">
+			 	<source>cannot_create_inventory_for_campaign_products</source>
+				<target>It is not possible to create inventory for campaign products</target>
+            </trans-unit>
+            <trans-unit id="irprv" resname="inventory_reference_price_rule_violated">
+			 	<source>inventory_reference_price_rule_violated</source>
+				<target>Inventory price is out of reference price margin</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

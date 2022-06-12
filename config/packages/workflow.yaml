@@ -1,0 +1,54 @@
+framework:
+    workflows:
+        return_request:
+            type: 'state_machine'
+            marking_store:
+                type: 'method'
+                property: 'status'
+            supports:
+                - App\Entity\ReturnRequestItem
+            places:
+                - !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::APPROVED
+                - !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::RETURNING
+                - !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::RETURNED
+                - !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::WAITING_REFUND
+                - !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::REFUNDED
+                - !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::REJECTED
+                - !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::CANCELED
+            transitions:
+                !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestTransition::WAREHOUSE_CONFIRM:
+                    from: !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::APPROVED
+                    to: !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::RETURNING
+                    guard: "subject.getIsReturnable()"
+
+                !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestTransition::CANCEL:
+                    from: [
+                        !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::APPROVED,
+                        !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::RETURNING
+                    ]
+                    to: !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::CANCELED
+
+                !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestTransition::WAREHOUSE_RECEIVE:
+                    from: !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::RETURNING
+                    to: !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::RETURNED
+
+                !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestTransition::WAREHOUSE_EVALUATE:
+                    from: !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::RETURNED
+                    to: !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::WAITING_REFUND
+                    metadata:
+                        requiredData: [ 'warehouseReasonId', 'warehouseReason', 'warehouseDescription', 'extraCost', 'postCost']
+
+                !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestTransition::REJECT:
+                    from: !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::RETURNED
+                    to: !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::REJECTED
+                    metadata:
+                        requiredData: [ 'warehouseReasonId', 'warehouseReason', 'warehouseDescription', 'extraCost', 'postCost' ]
+
+                !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestTransition::WAIT_FOR_REFUND:
+                    from: !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::APPROVED
+                    to: !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::WAITING_REFUND
+                    guard: "!subject.getIsReturnable()"
+
+                !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestTransition::REFUND:
+                    from: !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::WAITING_REFUND
+                    to: !php/const App\Service\Order\ReturnRequest\Transition\ReturnRequestStatus::REFUNDED

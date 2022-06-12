@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name=”viewport” content=”width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;”/>
+    <title>factor</title>
+    <style>
+        /** fonts **/
+        @font-face {
+            font-family: dana-regular;
+            src: url('{{ baseUrl }}/assets/fonts/dana-regular.eot');
+            src: url('{{ baseUrl }}/assets/fonts/dana-regular.eot?#iefix') format('embedded-opentype'),
+            url('{{ baseUrl }}/assets/fonts/dana-regular.woff2') format('woff2'),
+            url('{{ baseUrl }}/assets/fonts/dana-regular.woff') format('woff'),
+            url('{{ baseUrl }}/assets/fonts/dana-regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: dana-regular;
+            src: url('{{ baseUrl }}/assets/fonts/dana-fanum-regular.eot');
+            src: url('{{ baseUrl }}/assets/fonts/dana-fanum-regular.eot?#iefix') format('embedded-opentype'),
+            url('{{ baseUrl }}/assets/fonts/dana-fanum-regular.woff2') format('woff2'),
+            url('{{ baseUrl }}/assets/fonts/dana-fanum-regular.woff') format('woff'),
+            url('{{ baseUrl }}/assets/fonts/dana-fanum-regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: dana-bold;
+            font-style: normal;
+            font-weight: bold;
+            src: url('{{ baseUrl }}/assets/fonts/dana-bold.eot');
+            src: url('{{ baseUrl }}/assets/fonts/dana-bold.eot?#iefix') format('embedded-opentype'), /* IE6-8 */ url('{{ baseUrl }}/assets/fonts/dana-bold.woff2') format('woff2'), /* FF39+,Chrome36+, Opera24+*/ url('{{ baseUrl }}/assets/fonts/dana-bold.woff') format('woff'), /* FF3.6+, IE9, Chrome6+, Saf5.1+*/ url('{{ baseUrl }}/assets/fonts/dana-bold.ttf') format('truetype');
+        }
+
+        @font-face {
+            font-family: dana-bold;
+            font-style: normal;
+            font-weight: bold;
+            src: url('{{ baseUrl }}/assets/fonts/dana-fanum-bold.eot');
+            src: url('{{ baseUrl }}/assets/fonts/dana-fanum-bold.eot?#iefix') format('embedded-opentype'), /* IE6-8 */ url('{{ baseUrl }}/assets/fonts/dana-fanum-bold.woff2') format('woff2'), /* FF39+,Chrome36+, Opera24+*/ url('{{ baseUrl }}/assets/fonts/dana-fanum-bold.woff') format('woff'), /* FF3.6+, IE9, Chrome6+, Saf5.1+*/ url('{{ baseUrl }}/assets/fonts/dana-fanum-bold.ttf') format('truetype');
+        }
+
+        /** end fonts **/
+        body {
+            direction: rtl;
+            text-align: right;
+            font-size: 12px;
+            font-family: dana-regular;
+            color: #141414;
+        }
+
+        .en {
+            font-family: verdana;
+        }
+
+        .wrapper {
+            width: 1000px;
+            margin: auto;
+        }
+
+        .main_table .caption_main {
+            font-size: 22px;
+            font-family: dana-bold;
+        }
+
+        .caption_bottom {
+            font-size: 16px;
+            font-family: dana-bold;
+            padding-top: 16px;
+            text-align: center;
+        }
+
+        .main_table .table_head > tbody > tr > td {
+            border: solid 1px #141414;
+        }
+
+        .main_table .table_head td {
+            padding: 8px 4px;
+        }
+
+        .main_table .table_head td .caption {
+            font-family: dana-bold;
+        }
+
+        .main_table .table_head td .value {
+            padding-right: 4px;
+        }
+
+        .main_table .table_head td .caption_normal {
+            padding-left: 24px;
+        }
+
+        .main_table .table_head td .value_align_left {
+            text-align: left;
+            float: left;
+        }
+
+        .main_table .table_head td .value_align_center {
+            text-align: center;
+        }
+
+        .main_table .table_head .small_cell td.barcode {
+            padding: 10px;
+            border: solid 1px #000;
+        }
+
+        .main_table td.table_holder {
+            padding: 0;
+        }
+
+        .main_table .table_head .row_title {
+            font-family: dana-bold;
+            text-align: center;
+            background: #f0f0f0;
+        }
+
+        /** table body **/
+        .main_table .table_body_holder {
+            padding: 2px;
+        }
+
+        .main_table .table_body {
+            border-collapse: collapse;
+        }
+
+        .main_table .table_body > thead > tr > th, .main_table .table_body > tbody > tr > td {
+            border: solid 1px #141414;
+            text-align: center;
+            padding: 16px 4px;
+            font-weight: normal;
+        }
+
+        .main_table .table_body thead th {
+            background: #f0f0f0;
+            font-size: 11px;
+            width: calc(100% / 10);
+        }
+
+        .main_table .table_body thead th.pro_cell {
+            min-width: 400px;
+        }
+
+        .main_table .table_body td.pro {
+            text-align: right;
+            width: 200px;
+        }
+
+        .main_table .table_body td.pro .code {
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        .main_table .table_body td.code {
+            width: 200px;
+        }
+
+        .main_table .table_body .total_price_row {
+            background: #f0f0f0;
+        }
+
+        .main_table .table_body .total_price_row td {
+            padding: 4px;
+        }
+
+        .main_table .table_body tfoot {
+            border: solid 1px #141414;
+        }
+
+        .main_table .table_body tfoot td {
+            padding: 4px;
+        }
+
+        .main_table .table_body tfoot td .value {
+            padding-top: 16px;
+            padding-right: 104px;
+        }
+
+        .stamp {
+            display: block;
+            max-width: 170px;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+
+    <table class="main_table" width="1000" border="0" cellpadding="0" cellspacing="0">
+        <caption class="caption_main">صورتحساب نیابتی فروش کالا و خدمات</caption>
+        <tr>
+            <td>
+                <table class="table_head" width="100%" border="0" cellspacing="2">
+                    <tr>
+                        <td class="row_title">حق العمل کار</td>
+                        <td class="table_holder">
+                            <table class="table_head_inner_seller" width="100%" border="0">
+                                <tr>
+                                    <td>
+                                        <span class="caption">فروشنده:</span>
+                                        <span class="value">نوین تجارت مجازي آریا (سهامی خاص)</span>
+                                    </td>
+                                    <td>
+                                        <span class="caption">شناسه ملی:</span>
+                                        <span class="value">14008214255</span>
+                                    </td>
+                                    <td>
+                                        <span class="caption">شماره ثبت:</span>
+                                        <span class="value">538965</span>
+                                    </td>
+                                    <td>
+                                        <span class="caption">شماره اقتصادی:</span>
+                                        <span class="value">411667791914</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <span class="caption">نشانی شرکت:</span>
+                                        <span class="value">آدرس تهران-خیابان ولیعصر روبروي فاطمی-کوچه عبده پلاك 46 واحد 5</span>
+                                    </td>
+                                    <td>
+                                        <span class="caption">کدپستی:</span>
+                                        <span class="value">1594943916</span>
+                                    </td>
+                                    <td>
+                                        <span class="caption">تلفن و فکس:</span>
+                                        <span class="value">91070210-021</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="table_holder">
+                            <table class="small_cell" width="100%" border="0">
+                                <tr>
+                                    <td>
+                                        <span class="caption_normal">شماره فاکتور:</span>
+                                        <span class="value_align_center">{{ order.id }}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="row_title">خریدار</td>
+                        {% set orderIslegal = order.getIsLegal %}
+                        <td class="table_holder">
+                            <table class="table_head_inner_buyer" width="100%" border="0">
+                                <tr>
+                                    <td>
+                                        <span class="caption">خریدار:</span>
+                                        {% if orderIslegal %}
+                                            <span class="value">{{ order.getLegalAccount.getOrganizationName }}</span>
+                                        {% else %}
+                                            <span class="value">{{ order.getCustomer.getName }} {{ order.getCustomer.getFamily }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if orderIslegal %}
+                                            <span class="caption">شماره اقتصادی:</span>
+                                            <span class="value">{{ order.getLegalAccount.getEconomicCode }}</span>
+                                        {% else %}
+                                            <span class="caption">شماره ملی:</span>
+                                            <span class="value">{{ order.getCustomer.getNationalNumber }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="caption">شناسه ملی:</span>
+                                        {% if orderIslegal %}
+                                            <span class="value">{{ order.getLegalAccount.getNationalId }}</span>
+                                        {% else %}
+                                            <span class="value">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="caption">شماره ثبت:</span>
+                                        {% if orderIslegal %}
+                                            <span class="value">{{ order.getLegalAccount.getRegistrationId }}</span>
+                                        {% else %}
+                                            <span class="value">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <span class="caption">نشانی:</span>
+                                        <span class="value">{{ order.getOrderAddress.getFullAddress }}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <span class="caption">شماره تماس:</span>
+                                        {% if orderIslegal %}
+                                            <span class="value">{{ order.getLegalAccount.getPhoneNumber }}</span>
+                                        {% else %}
+                                            <span class="value">{{ order.getCustomer.getMobile }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td colspan="2">
+                                        <span class="caption">کدپستی:</span>
+                                        <span class="value">{{ order.getOrderAddress.getPostalCode }}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="table_holder">
+                            <table class="small_cell" width="100%" border="0">
+                                <tr>
+                                    <td>
+                                        <span class="caption_normal">تاریخ:</span>
+                                        <span class="value_align_center">{{ orderCreationDate }}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="table_body_holder">
+                <table class="table_body" width="100%" border="0" cellpadding="0" cellspacing="0">
+                    <thead>
+                    <tr>
+                        <th>ردیف</th>
+                        <th>کد کالا</th>
+                        <th>شرح کالا</th>
+                        <th>آمر</th>
+                        <th>تعداد</th>
+                        <th>مبلغ واحد (ریال)</th>
+                        <th>مبلغ کل (ریال)</th>
+                        <th>تخفیف (ریال)</th>
+                        <th>مبلغ کل پس از تخفیف (ریال)</th>
+                        <th>جمع مالیات و عوارض (ریال)</th>
+                        <th>جمع کل پس از تخفیف و مالیات و عوارض (ریال)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {% set totalPrice = 0 %}
+                    {% for orderItem in orderItems %}
+                        {% set totalPrice = totalPrice + orderItem.getGrandTotal %}
+
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ orderItem.getInventory.getVariant.getProduct.getId }}</td>
+                            <td class="pro">
+                                <div>
+                                    {{ orderItem.getInventory.getVariant.getProduct.getTitle }} |
+                                    {{ orderItem.getInventory.getVariant.getGuaranty.getValue }} |
+                                    {{ orderItem.getInventory.getVariant.getColor.getValue }} |
+                                    {{ orderItem.getInventory.getVariant.getOtherOptions | map((value) => "#{value.option.name} #{value.value}") | join(', ') }}
+                                </div>
+                                <div class="code en">TVI-{{ orderItem.getInventory.getId }}</div>
+                            </td>
+                            <td class="co">{{ orderItem.getInventory.getSeller.getName }}</td>
+                            <td>{{ orderItem.getQuantity }}</td>
+                            <td>{{ ((orderItem.getGrandTotal / orderItem.getQuantity) * 10)  | number_format(0, '.', ',') }}</td>
+                            <td>{{ (orderItem.getGrandTotal * 10)  | number_format(0, '.', ',') }}</td>
+                            <td>0</td>
+                            <td>{{ (orderItem.getGrandTotal * 10)  | number_format(0, '.', ',') }}</td>
+                            <td>0</td>
+                            <td>{{ (orderItem.getGrandTotal * 10)  | number_format(0, '.', ',') }}</td>
+                        </tr>
+                    {% endfor %}
+
+                    <tr class="total_price_row">
+                        <td colspan="7"></td>
+                        <td colspan="3">جمع کل پس از تخفیف و مالیات و عوارض (ریال)</td>
+                        <td>{{ (totalPrice * 10) | number_format(0, '.', ',') }}</td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="3">
+                            <span class="caption_normal">مهر و امضای فروشنده:</span>
+                            <div class="value">
+                                <img class="stamp" src="{{ baseUrl }}/assets/images/stamp-05.jpg">
+                            </div>
+                        </td>
+                        <td colspan="2">
+                        </td>
+                        <td colspan="3">
+                        </td>
+                        <td colspan="3">
+                            <span class="caption_normal">مهر و امضای خریدار:</span>
+                            <div class="value"> ---</div>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <div class="caption_bottom" style="caption-side:bottom;">به هنگام ارسال در سامانه معاملات فصلی (ماده 169 مکرر) گزینه خرید از طریق حق العمل کار را انتخاب کنید.</div>
+</div>
+</body>
+</html>

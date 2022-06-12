@@ -1,0 +1,75 @@
+version: '3.8'
+services:
+  db:
+    image: percona/percona-server:8.0.23-14
+    restart: always
+    environment:
+      MYSQL_DATABASE: timcheh
+      MYSQL_USER: timcheh
+      MYSQL_PASSWORD: timcheh
+      MYSQL_ROOT_PASSWORD: root
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      VIRTUAL_HOST: pma.timcheh.local
+
+  rmq:
+    image: rabbitmq:management-alpine
+    restart: always
+    environment:
+      VIRTUAL_HOST: rmq.timcheh.local
+      VIRTUAL_PORT: 15672
+
+  redis:
+    image: redis:alpine
+    restart: always
+
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root
+      ME_CONFIG_MONGODB_URL: mongodb://root:root@mongo:27017/
+      VIRTUAL_HOST: mongo.timcheh.local
+      VIRTUAL_PORT: 8081
+
+  fpm:
+    build: 
+      context: ./deploy/fpm
+    restart: always
+    volumes:
+      - ./:/var/www/shop
+
+  ngx:
+    build: ./deploy/ngx
+    restart: always
+    environment:
+      VIRTUAL_HOST: api.timcheh.local
+    volumes:
+      - ./:/var/www/shop
+
+  whoami:
+    image: jwilder/whoami
+    restart: always
+    environment:
+      VIRTUAL_HOST: whoami.timcheh.local
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+

@@ -1,0 +1,10 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    bind:
+      $developmentAutoLogin: '%env(ENABLE_DEVELOPMENT_AUTO_LOGIN)%'
+
+  App\EventSubscriber\DevelopmentAutoLoginListener:
+    tags:
+      - { name: kernel.event_listener, method: onRequest, priority: 10 }

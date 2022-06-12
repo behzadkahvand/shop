@@ -1,0 +1,422 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+  holiday_service_driver: '%env(HOLIDAY_SERVICE_DRIVER)%'
+  sms_driver: '%env(SMS_DRIVER)%'
+  default_brand_results_cache_lifetime: -1
+  default_inventory_results_cache_lifetime: -1
+  default_seller_order_item_results_cache_lifetime: -1
+  default_customer_product_attribute_results_cache_lifetime: 2592000
+  default_order_balance_refund_send_notification: true
+  media_upload_path: '%env(resolve:MEDIA_PATH)%'
+  env(MONGODB_URL): ''
+  env(MONGODB_DB): ''
+  throwable_metadata_factory_file: '%kernel.project_dir%/src/Service/ExceptionHandler/ThrowableMetadataFactoryList.php'
+  refresh_token_ttl: "%env(int:JWT_REFRESH_TOKEN_TTL)%"
+  notification_cache_ttl: 28800
+  fos_elastica.property_accessor.magicCall: 0
+  fos_elastica.property_accessor.throwExceptionOnInvalidIndex: 0
+  tokens:
+    lendo: "%env(LENDO_TOKEN)%"
+    monitoring: "%env(MONITORING_TOKEN)%"
+
+services:
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    bind:
+      $uploadsPath: '%media_upload_path%'
+      $isDebug: '%kernel.debug%'
+      $projectDirectory: '%kernel.project_dir%'
+      $callableHolidayCalculator: null
+      $mediaBackend: '%env(MEDIA_BASE_URL)%'
+      $isExceptionHandlerEnable: '%env(ENABLE_EXCEPTION_HANDLER)%'
+      $contactUsEmail: '%env(CONTACT_US_EMAIL)%'
+      $sellerFormEmail: '%env(SELLER_FORM_EMAIL)%'
+      $irankishMerchantId: '%env(IRANKISH_GATEWAY_MERCHANT_ID)%'
+      $irankishSha1Key: '%env(IRANKISH_GATEWAY_SHA1KEY)%'
+      $samanMerchantId: '%env(SAMAN_GATEWAY_TERMINAL_ID)%'
+      $parsianMerchantId: '%env(PARSIAN_GATEWAY_MERCHANT_ID)%'
+      $vandarMerchantId: '%env(VANDAR_GATEWAY_MERCHANT_ID)%'
+      $cpgMerchantId: '%env(CPG_GATEWAY_MERCHANT_ID)%'
+      $mellatMerchantId: '%env(MELLAT_GATEWAY_MERCHANT_ID)%'
+      $mellatUsername: '%env(MELLAT_GATEWAY_USERNAME)%'
+      $mellatPassword: '%env(MELLAT_GATEWAY_PASSWORD)%'
+      $sadadTerminalId: '%env(SADAD_GATEWAY_TERMINAL_ID)%'
+      $sadadMerchantId: '%env(SADAD_GATEWAY_MERCHANT_ID)%'
+      $zibalMerchantId: '%env(ZIBAL_GATEWAY_MERCHANT_ID)%'
+      $zibalCODMerchantId: '%env(ZIBAL_COD_MERCHANT_ID)%'
+      $zibalCODSecretKey: '%env(ZIBAL_COD_SECRET_KEY)%'
+      $eFardaUsername: '%env(EFARDA_GATEWAY_USERNAME)%'
+      $eFardaPassword: '%env(EFARDA_GATEWAY_PASSWORD)%'
+      $eFardaServiceId: '%env(EFARDA_GATEWAY_SERVICE_ID)%'
+      $hamrahCardKey: '%env(HAMRAH_CARD_KEY)%'
+      $hamrahCardTerminalNumber: '%env(HAMRAH_CARD_GATEWAY_TERMINAL_NUMBER)%'
+      $hamrahCardSerialNumber: '%env(HAMRAH_CARD_GATEWAY_SERIAL_NUMBER)%'
+      $sadadKey: '%env(SADAD_GATEWAY_KEY)%'
+      Gesdinet\JWTRefreshTokenBundle\Service\RefreshToken $customerRefreshToken: '@app.refresh_token.customer'
+      Gesdinet\JWTRefreshTokenBundle\Service\RefreshToken $sellerRefreshToken: '@app.refresh_token.seller'
+      Gesdinet\JWTRefreshTokenBundle\Service\RefreshToken $adminRefreshToken: '@app.refresh_token.admin'
+      $successfulPaymentRedirectUrl: '%env(SUCCESSFUL_PAYMENT_REDIRECT_URL)%'
+      $failedPaymentRedirectUrl: '%env(FAILED_PAYMENT_REDIRECT_URL)%'
+      $onlineGateways: '%online_gateways%'
+      $codGateways: '%cod_gateways%'
+      $pdfGeneratorBaseUrl: '%env(WKHTMLTOPDF_BASE_URL)%'
+      $editableNotifications: '%editable_notifications%'
+      $porslineApiKey: '%env(PORSLINE_API_KEY)%'
+      $zibalGatewayUrl: '%env(ZIBAL_GATEWAY_URL)%'
+
+  _instanceof:
+    App\Service\Payment\Gateways\GatewayInterface:
+      tags:
+        - { name: app.payment.online_gateway }
+    App\Service\Payment\Gateways\COD\GatewayInterface:
+      tags:
+        - { name: app.payment.cod_gateway }
+    App\Service\OrderAffiliator\PurchaseRequest\AffiliatorPurchaseRequestInterface:
+      tags:
+        - { name: app.order.affiliator_request }
+
+  # makes classes in src/ available to be used as services
+  # this creates a service per class whose id is the fully-qualified class name
+  App\:
+    resource: '../src/*'
+    exclude:
+      - '../src/{DependencyInjection,Dictionary,Entity,Events,Tests,Kernel.php,Service/Utils/functions.php}'
+      - '../src/{DTO,Exceptions,Messaging/Messages,Response}'
+      - '../src/**/{DTO,Exceptions,ValueObject*,Delta}/**'
+      - '%throwable_metadata_factory_file%'
+      - '../src/Service/PartialShipment/Types/{AbstractPartialShipment.php,ExpressPartialShipment.php,PartialShipment.php}'
+      - '../src/Service/Product/Search/{Queries,DoctrineSearchData.php,SearchData.php,SearchResult.php}'
+      - '../src/Service/Utils/Pagination/Pagination.php'
+
+  # controllers are imported separately to make sure services can be injected
+  # as action arguments even if you don't extend any base controller class
+  App\Controller\:
+    resource: '../src/Controller'
+    tags: [ 'controller.service_arguments' ]
+
+  # add more service definitions when explicit configuration is needed
+  # please note that last definitions always *replace* previous ones
+  App\Service\Product\Search\Meta\SearchMetaResolverInterface: '@App\Service\Product\Search\Meta\Adapters\Doctrine\DoctrineSearchMetaResolverAdapter'
+  Liip\ImagineBundle\Service\FilterService: '@liip_imagine.service.filter'
+  Symfony\Component\Filesystem\Filesystem: '@filesystem'
+  App\Service\Order\Condition\OrderConditionInterface: '@App\Service\Order\Condition\OrderConditionsAggregator'
+  FOS\ElasticaBundle\Persister\PersisterRegistry: '@fos_elastica.persister_registry'
+  App\Service\Order\AutoConfirm\AutoConfirmOrderServiceInterface: '@App\Service\Order\AutoConfirm\AutoConfirmOrderService'
+  App\Service\PartialShipment\Grouping\PartialShipmentItemGrouperInterface: '@App\Service\PartialShipment\Grouping\Adapters\ShippingCategoryGrouper'
+  App\Service\RateAndReview\Statistics\RateAndReviewStatisticsServiceInterface: '@App\Service\RateAndReview\Statistics\RateAndReviewStatisticsAggregator'
+  App\Service\Product\Similar\SimilarProductServiceInterface: '@App\Service\Product\Similar\SimilarProductService'
+  App\Service\Product\Search\Utils\Doctrine\InventoryPriceRangeInterface: '@App\Service\Product\Search\Utils\Doctrine\InventoryPriceRangeCalculator'
+
+  App\Service\ORM\QueryBuilderFilterService:
+    arguments:
+      $collectionExtensions: !tagged { tag: app.query_builder_filter_extension }
+
+  App\Service\Utils\Error\ErrorExtractor:
+    arguments:
+      $extractors: !tagged { tag: app.error_extractor }
+
+  App\Service\Order\OrderStatus\OrderStatusFactory:
+    arguments:
+      $orderStatuses: !tagged { tag: app.order_statuses }
+
+  App\Service\OrderShipment\OrderShipmentStatus\OrderShipmentStatusFactory:
+    arguments:
+      $orderShipmentStatuses: !tagged { tag: app.order_shipment_statuses }
+
+  App\Service\OTP\OtpService:
+    arguments:
+      $expireTime: '%env(OTP_EXPIRE_TIME)%'
+
+  App\Service\Notification\SMS\Adapters\NikSmsDriverAdapter:
+    arguments:
+      $smsProviderApi: '%env(SMS_PROVIDER_API)%'
+      $smsProviderUsername: '%env(SMS_PROVIDER_USERNAME)%'
+      $smsProviderPassword: '%env(SMS_PROVIDER_PASSWORD)%'
+      $smsProviderSenderNumber: '%env(SMS_PROVIDER_SENDER_NUMBER)%'
+
+  App\Service\Notification\SMS\Adapters\KavenegarDriverAdapter:
+    arguments:
+      $smsProviderApi: '%env(SMS_PROVIDER_API)%'
+      $smsProviderApiKey: '%env(SMS_PROVIDER_API_KEY)%'
+      $smsProviderSenderNumber: '%env(SMS_PROVIDER_SENDER_NUMBER)%'
+
+  App\Service\Notification\NotificationService:
+    arguments:
+      $cacheLifeTime: '%env(default:notification_cache_ttl:NOTIFICATION_CACHE_TTL)%'
+
+  App\Service\Cart\Processor\CartProcessorInterface:
+    alias: App\Service\Cart\Processor\CartProcessorAggregator
+
+  App\Service\Cart\Processor\CartProcessorAggregator:
+    arguments:
+      - !tagged_iterator { tag: app.cart.processor, default_priority_method: getPriority }
+
+  App\Service\Cart\Condition\CartConditionInterface:
+    alias: App\Service\Cart\Condition\CartConditionsAggregator
+
+  App\Service\Cart\Condition\CartConditionsAggregator:
+    arguments:
+      $conditions: !tagged { tag: app.cart.conditions }
+
+  App\Service\Order\Condition\OrderConditionsAggregator:
+    arguments:
+      $conditions: !tagged { tag: app.order.conditions }
+
+  App\Service\PartialShipment\Price\PartialShipmentShippingMethodAndPriceCalculator:
+    arguments:
+      $rules: !tagged { tag: app.partial_shipment.price_calculator }
+
+  App\Service\RateAndReview\Statistics\RateAndReviewStatisticsAggregator:
+    arguments:
+      $statistics: !tagged { tag: app.rate_and_review.statistics }
+
+  App\Service\Carrier\COD\Condition\CODConditionsAggregator:
+    arguments:
+      $conditions: !tagged { tag: app.cod.conditions }
+
+  App\Repository\BrandRepository:
+    arguments:
+      $resultCacheExpireTime: '%env(default:default_brand_results_cache_lifetime:BRAND_RESULTS_CACHE_LIFETIME)%'
+
+  App\Repository\InventoryRepository:
+    arguments:
+      $resultCacheExpireTime: '%env(default:default_inventory_results_cache_lifetime:INVENTORY_RESULTS_CACHE_LIFETIME)%'
+
+  App\Repository\SellerOrderItemRepository:
+    arguments:
+      $resultCacheExpireTime: '%env(default:default_seller_order_item_results_cache_lifetime:SELLER_ORDER_ITEM_RESULTS_CACHE_LIFETIME)%'
+
+  App\Repository\ProductAttributeRepository:
+    arguments:
+      $resultCacheExpireTime: '%env(default:default_customer_product_attribute_results_cache_lifetime:CUSTOMER_PRODUCT_ATTRIBUTE_RESULTS_CACHE_LIFETIME)%'
+
+  App\Service\Order\OrderBalanceRefund\OrderBalanceRefundService:
+    arguments:
+      $sendNotification: '%env(default:default_order_balance_refund_send_notification:ORDER_BALANCE_REFUND_SEND_NOTIFICATION)%'
+
+  App\EventSubscriber\SentryErrorListenerDecorator:
+    decorates: Sentry\SentryBundle\EventListener\ErrorListener
+    arguments:
+      - '@App\EventSubscriber\SentryErrorListenerDecorator.inner'
+
+  Sentry\Integration\IgnoreErrorsIntegration:
+    arguments:
+      $options:
+        ignore_exceptions:
+          - 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException'
+          - 'Symfony\Component\Security\Core\Exception\AccessDeniedException'
+          - 'Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException'
+          - 'Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException'
+          - 'Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException'
+
+  App\Service\Product\Search\Meta\Adapters\Doctrine\DoctrineSearchMetaResolverAdapter:
+    arguments:
+      $resolvers: !tagged_iterator { tag: app.search_meta_resolvers.doctrine }
+
+  App\Service\Order\OrderService:
+    arguments:
+      $stages: !tagged_iterator { tag: app.pipeline_stage.order_processing, default_priority_method: getPriority }
+
+  App\Service\Product\Seller\ProductMetaProvider:
+    arguments:
+      $resolvers: !tagged_iterator { tag: app.seller_product_meta_resolvers }
+
+  App\Service\ExceptionHandler\MetadataLoader:
+    arguments:
+      $metadataLoaders: !tagged_iterator { tag: app.exception_handler.metadata_loader, default_priority_method: getPriority }
+
+  App\Service\MongoFilter\PipelineMongoQueryBuilder:
+    arguments:
+      $stages: !tagged_iterator { tag: app.pipeline_stage.mongo_query_builder, default_priority_method: getPriority }
+
+  App\Service\SearchSuggestion\SearchSuggestionAdapter:
+    arguments:
+      $resolvers: !tagged_iterator { tag: app.search_suggestion_resolvers }
+
+  App\Service\ExceptionHandler\Configurator\StaticListMetadataLoaderConfigurator:
+    arguments:
+      $metadataFactoryList: '%throwable_metadata_factory_file%'
+
+  App\Service\ExceptionHandler\Loaders\StaticListMetadataLoader:
+    configurator: [ '@App\Service\ExceptionHandler\Configurator\StaticListMetadataLoaderConfigurator', 'configure' ]
+
+  app.refresh_token_user_provider.customer:
+    class: Gesdinet\JWTRefreshTokenBundle\Security\Provider\RefreshTokenProvider
+    parent: gesdinet.jwtrefreshtoken.user_provider
+    calls:
+      - { method: setCustomUserProvider, arguments: [ '@security.user.provider.concrete.app_customer_provider' ] }
+
+  app.refresh_token.customer:
+    class: Gesdinet\JWTRefreshTokenBundle\Service\RefreshToken
+    parent: gesdinet.jwtrefreshtoken
+    arguments:
+      $provider: '@app.refresh_token_user_provider.customer'
+
+  app.refresh_token_user_provider.seller:
+    class: Gesdinet\JWTRefreshTokenBundle\Security\Provider\RefreshTokenProvider
+    parent: gesdinet.jwtrefreshtoken.user_provider
+    calls:
+      - { method: setCustomUserProvider, arguments: [ '@security.user.provider.concrete.app_seller_provider' ] }
+
+  app.refresh_token.seller:
+    class: Gesdinet\JWTRefreshTokenBundle\Service\RefreshToken
+    parent: gesdinet.jwtrefreshtoken
+    arguments:
+      $provider: '@app.refresh_token_user_provider.seller'
+
+  App\Messaging\Handlers\Command\:
+    resource: '../src/Messaging/Handlers/Command'
+    autoconfigure: false
+    tags: [ { name: messenger.message_handler, bus: command.bus } ]
+
+  App\Messaging\Handlers\Event\:
+    resource: '../src/Messaging/Handlers/Event'
+    autoconfigure: false
+    tags: [ { name: messenger.message_handler, bus: event.bus } ]
+
+  #@TODO Fix logger dependency for autoconfigure false handlers!
+  #We can inject to constructor and resolve this!
+  App\Messaging\Handlers\Command\Notification\AbandonedCartHandler:
+    autoconfigure: false
+    tags: [ { name: messenger.message_handler, bus: command.bus } ]
+    calls:
+      - { method: setLogger, arguments: [ '@logger' ] }
+
+  App\Messaging\Handlers\Command\Order\AddBalanceAmountToOrderHandler:
+    autoconfigure: false
+    tags: [ { name: messenger.message_handler, bus: command.bus } ]
+    calls:
+      - { method: setLogger, arguments: [ '@logger' ] }
+
+  App\Messaging\Handlers\Command\Order\SendOrderAffiliatorPurchaseRequestHandler:
+    autoconfigure: false
+    tags: [ { name: messenger.message_handler, bus: command.bus } ]
+    calls:
+      - { method: setLogger, arguments: [ '@logger' ] }
+
+  App\Messaging\Handlers\Command\Product\AddBuyBoxToProductHandler:
+    autoconfigure: false
+    tags: [ { name: messenger.message_handler, bus: command.bus } ]
+    calls:
+      - { method: setLogger, arguments: [ '@logger' ] }
+
+  App\Messaging\Handlers\Command\Product\AddColorsToProductHandler:
+    autoconfigure: false
+    tags: [ { name: messenger.message_handler, bus: command.bus } ]
+    calls:
+      - { method: setLogger, arguments: [ '@logger' ] }
+
+  App\Messaging\Handlers\Command\Seo\AddTitleAndMetaDescriptionHandler:
+    autoconfigure: false
+    tags: [ { name: messenger.message_handler, bus: command.bus } ]
+    calls:
+      - { method: setLogger, arguments: [ '@logger' ] }
+  #EOF_@TO_DO
+
+  App\Service\Inventory\DepotInventory\NotifyDepotInventorySmsHandler:
+    autoconfigure: false
+    tags: [ { name: messenger.message_handler, bus: command.bus, handles: App\Service\Inventory\DepotInventory\DepotInventoryMessage } ]
+
+  app.messenger.transport.async_message_serializer:
+    class: App\Messaging\Serializers\Command\AsyncMessageSerializer
+    arguments:
+      $serializer: '@messenger.transport.native_php_serializer'
+
+  app.refresh_token_user_provider.admin:
+    class: Gesdinet\JWTRefreshTokenBundle\Security\Provider\RefreshTokenProvider
+    parent: gesdinet.jwtrefreshtoken.user_provider
+    calls:
+      - { method: setCustomUserProvider, arguments: [ '@security.user.provider.concrete.app_admin_provider' ] }
+
+  app.refresh_token.admin:
+    class: Gesdinet\JWTRefreshTokenBundle\Service\RefreshToken
+    parent: gesdinet.jwtrefreshtoken
+    arguments:
+      $provider: '@app.refresh_token_user_provider.admin'
+
+  App\EventSubscriber\AuthenticationSubscriber:
+    arguments:
+      $expireTime: '%env(TOKEN_EXPIRE_TIME)%'
+      $refreshTokenTtl: "%refresh_token_ttl%"
+
+  App\Service\Layout\BlockAggregator:
+    arguments:
+      $blocks: !tagged_iterator { tag: app.layout.block }
+
+  App\Service\Layout\OnSaleBlockAggregator:
+    arguments:
+      $blocks: !tagged_iterator { tag: app.layout.on_sale.block }
+
+  App\Service\Seller\SellerOrderItem\Status\SellerOrderItemStatusFactory:
+    arguments:
+      $statuses: !tagged_iterator { tag: app.seller_order_item_status }
+
+  App\Service\Seller\SellerPackage\Status\SellerPackageStatusFactory:
+    arguments:
+      $statuses: !tagged_iterator { tag: app.seller_package_status_factory }
+
+  App\Service\ProductAttribute\ProductAttributeValueService:
+    arguments:
+      $types: !tagged_iterator { tag: app.product_attribute_value_service }
+
+  App\Service\Product\Availability\ProductAvailabilityChecker:
+    arguments:
+      $availabilityCheckers: !tagged_iterator { tag: app.product.availability_by_inventory_checker }
+
+  App\Service\Product\Availability\Listeners\ProductAvailabilityListener:
+    tags:
+      - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Inventory', method: 'onInventoryPreFlush' }
+      - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Inventory', method: 'onInventoryPreFlush' }
+
+  App\Service\Product\ProductSetChannelListener:
+    tags:
+      - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Product', method: 'onProductPrePersist' }
+
+  App\Service\ProductVariant\CreateProductVariantWithInventoryService:
+    configurator: [ '@App\Service\ProductVariant\Configurator\CreateProductVariantWithInventoryConfigurator', 'configure' ]
+
+  App\Service\Product\BuyBox\ProductBuyBoxListener:
+    tags:
+      - { name: 'doctrine.orm.entity_listener', event: 'postPersist', entity: 'App\Entity\Inventory', method: 'onInventoryPostInsertOrUpdate' }
+      - { name: 'doctrine.orm.entity_listener', event: 'postUpdate', entity: 'App\Entity\Inventory', method: 'onInventoryPostInsertOrUpdate' }
+
+  App\Service\Product\Colors\ProductColorsListener:
+    tags:
+      - { name: 'doctrine.orm.entity_listener', event: 'postPersist', entity: 'App\Entity\Inventory', method: 'onInventoryPostInsertOrUpdate' }
+      - { name: 'doctrine.orm.entity_listener', event: 'postUpdate', entity: 'App\Entity\Inventory', method: 'onInventoryPostInsertOrUpdate' }
+
+  App\Service\Product\Logs\InventoryChangeLogListener:
+    tags:
+      - { name: 'doctrine.orm.entity_listener', event: 'postPersist', entity: 'App\Entity\Inventory', method: 'onInventoryPostInsert' }
+      - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Inventory', method: 'onInventoryPreUpdate' }
+
+  App\Service\Order\AutoConfirm\ConfigurableAutoConfirmOrderService:
+    decorates: 'App\Service\Order\AutoConfirm\AutoConfirmOrderServiceInterface'
+    arguments:
+      $decorated: '@.inner'
+
+  App\Service\PartialShipment\Factory\Calculators\Express\ExpressShipmentDeliveryDateAndPeriodCalculatorFactory:
+    arguments:
+      $strategies: !tagged_iterator { tag: app.express_shipment.delivery_date_and_period_calculator, default_priority_method: getPriority }
+
+  App\Service\File\FileHandlerFactory:
+    arguments:
+      $handlers: !tagged_iterator { tag: app.file.file_handler, default_priority_method: getPriority }
+
+  App\EventSubscriber\TokenSubscriber:
+    arguments:
+      $tokens: '%tokens%'
+
+  App\Service\Discount\MaxInventoryDiscountValidator:
+    arguments:
+      $defaultLimit: 80
+
+  App\Service\Product\Campaign\BlackFridayBatchUpdateService:
+    arguments:
+      $blackFridayFileTemplate: '%kernel.project_dir%/resources/black-friday-template.xlsx'

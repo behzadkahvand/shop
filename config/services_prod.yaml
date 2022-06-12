@@ -1,0 +1,34 @@
+parameters:
+  container.dumper.inline_factories: true
+  default_inventory_price_range_cache_lifetime: -1
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    bind:
+      $graylogTag: "%env(GRAYLOG_TAG)%"
+
+  App\Service\Holiday\Adapters\CacheHolidayService:
+    decorates: App\Service\Holiday\HolidayServiceInterface
+    decoration_priority: 0
+
+  App\Service\RateAndReview\Statistics\CacheRateAndReviewStatisticsAggregator:
+    decorates: App\Service\RateAndReview\Statistics\RateAndReviewStatisticsServiceInterface
+
+  App\Service\Product\Similar\ExcludeCurrentProductSimilarProductServiceDecorator:
+    decorates: App\Service\Product\Similar\SimilarProductServiceInterface
+    decoration_priority: 0
+
+  App\Service\Product\Similar\CacheableSimilarProductServiceDecorator:
+    decorates: App\Service\Product\Similar\SimilarProductServiceInterface
+    decoration_priority: 1
+
+  App\Service\Product\Search\Utils\Doctrine\CacheableInventoryPriceRangeDecorator:
+    decorates: App\Service\Product\Search\Utils\Doctrine\InventoryPriceRangeInterface
+    arguments:
+      $cacheExpireTime: '%env(default:default_inventory_price_range_cache_lifetime:INVENTORY_PRICE_RANGE_CACHE_LIFETIME)%'
+
+  App\Logger\Processor\GraylogTagProcessor:
+    tags:
+      - { name: monolog.processor, handler: graylog_debug }
+      - { name: monolog.processor, handler: graylog_error }

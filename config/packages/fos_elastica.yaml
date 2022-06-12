@@ -1,0 +1,17 @@
+# Read the documentation: https://github.com/FriendsOfSymfony/FOSElasticaBundle/blob/master/doc/setup.md
+fos_elastica:
+    clients:
+        default: { url: '%env(ELASTICSEARCH_URL)%' }
+    messenger:
+        enabled: true
+    indexes:
+        products:
+            index_name: products_%kernel.environment%
+            persistence:
+                driver: orm
+                model: App\Entity\Product
+                provider: ~
+                finder: ~
+                listener: ~
+                model_to_elastica_transformer:
+                  service: App\Service\ElasticSearch\Transformers\ProductTransformer

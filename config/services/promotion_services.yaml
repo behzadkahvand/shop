@@ -1,0 +1,123 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\Service\Promotion\Action\ActionTypeRegistry:
+        arguments:
+            $actionTypes: !tagged_locator {tag: 'app.promotion.action_type', index_by: 'key', default_index_method: 'getName'}
+
+    App\Service\Promotion\Rule\RuleTypeRegistry:
+        arguments:
+            $ruleTypes: !tagged_iterator {tag: 'app.promotion.rule_type', index_by: 'key', default_index_method: 'getName', default_priority_method: getPriority}
+
+    App\Service\Promotion\Action\DiscountValidation\ChainDiscountValidator:
+        arguments:
+            $conditionalDiscountValidators: !tagged_iterator { tag: 'app.promotion.conditional_discount_validators' }
+
+    App\Service\Promotion\PromotionProcessor:
+        arguments:
+            $promotionApplicator: '@App\Service\Promotion\Action\PromotionApplicator'
+            $promotionEligibilityChecker: '@App\Service\Promotion\Eligibility\ChainPromotionEligibilityChecker'
+            $promotionProvider: '@App\Repository\PromotionRepository'
+            $subjectLockChecker: '@App\Service\Promotion\SubjectLockChecker'
+
+    App\Service\Promotion\Eligibility\PromotionDurationEligibilityChecker:
+        tags:
+            - { name: app.promotion.eligibility_checker }
+
+    App\Service\Promotion\Eligibility\PromotionRulesEligibilityChecker:
+        tags:
+            - { name: app.promotion.eligibility_checker }
+        arguments:
+            - '@App\Service\Promotion\Rule\RuleTypeRegistry'
+
+    App\Service\Promotion\Eligibility\PromotionSubjectCouponEligibilityChecker:
+        tags:
+            - { name: app.promotion.eligibility_checker }
+        arguments:
+            - '@App\Service\Promotion\Eligibility\ChainPromotionCouponEligibilityChecker'
+
+    App\Service\Promotion\Eligibility\PromotionUsageLimitEligibilityChecker:
+        tags:
+            - { name: app.promotion.eligibility_checker }
+        arguments:
+            - '@App\Repository\OrderRepository'
+
+    App\Service\Promotion\Eligibility\WalletEligibilityChecker:
+        tags:
+            - { name: app.promotion.eligibility_checker }
+
+    App\Service\Promotion\Eligibility\ChainPromotionEligibilityChecker:
+        arguments:
+            $promotionEligibilityCheckers: !tagged_iterator { tag: 'app.promotion.eligibility_checker' }
+
+    App\Service\Promotion\Eligibility\ChainPromotionCouponEligibilityChecker:
+        arguments:
+            - !tagged_iterator { tag: 'app.promotion.coupon_eligibility_checker' }
+
+    App\Service\Promotion\Eligibility\PromotionCouponDurationEligibilityChecker:
+        tags:
+            - { name: app.promotion.coupon_eligibility_checker }
+
+    App\Service\Promotion\Eligibility\PromotionCouponCustomerEligibilityChecker:
+        tags:
+            - { name: app.promotion.coupon_eligibility_checker }
+
+    App\Service\Promotion\Eligibility\PromotionCouponPerCustomerUsageLimitEligibilityChecker:
+        tags:
+            - { name: app.promotion.coupon_eligibility_checker }
+        arguments:
+            - '@App\Repository\OrderRepository'
+
+    App\Service\Promotion\Eligibility\PromotionCouponUsageLimitEligibilityChecker:
+        tags:
+            - { name: app.promotion.coupon_eligibility_checker }
+        arguments:
+            - '@App\Repository\OrderRepository'
+
+    App\Service\Promotion\Action\DiscountCreator:
+        arguments:
+            $promotionDiscountFactoryLocator: !tagged_locator {tag: 'app.promotion.promotion_discount_factory', index_by: 'key', default_index_method: 'supportedSubjectClass'}
+            $discountValidator: '@App\Service\Promotion\Action\DiscountValidation\ChainDiscountValidator'
+
+    App\Service\Promotion\Action\FixedDiscountDistributor:
+        arguments:
+            $discountValidator: '@App\Service\Promotion\Action\DiscountValidation\ChainDiscountValidator'
+
+    App\Service\Promotion\Action\PercentageDiscountDistributor:
+        arguments:
+            $discountValidator: '@App\Service\Promotion\Action\DiscountValidation\ChainDiscountValidator'
+
+    app.per_order_item_fixed_discount_creator:
+        class: App\Service\Promotion\Action\PerItemDiscountCreator
+        arguments:
+            $promotionDiscountFactoryLocator: !tagged_locator {tag: 'app.promotion.promotion_discount_factory', index_by: 'key', default_index_method: 'supportedSubjectClass'}
+            $discountDistributor: '@App\Service\Promotion\Action\FixedDiscountDistributor'
+
+    app.per_order_item_percentage_discount_creator:
+        class: App\Service\Promotion\Action\PerItemDiscountCreator
+        arguments:
+            $promotionDiscountFactoryLocator: !tagged_locator {tag: 'app.promotion.promotion_discount_factory', index_by: 'key', default_index_method: 'supportedSubjectClass'}
+            $discountDistributor: '@App\Service\Promotion\Action\PercentageDiscountDistributor'
+
+    App\Service\Promotion\Action\FixedDiscountActionType:
+        arguments:
+            $discountCreator: '@app.per_order_item_fixed_discount_creator'
+            $discountValidator: '@App\Service\Promotion\Action\DiscountValidation\ChainDiscountValidator'
+        tags:
+            - { name: 'app.promotion.action_type' }
+    App\Service\Promotion\Action\PercentageDiscountActionType:
+        arguments:
+            $discountCreator: '@app.per_order_item_percentage_discount_creator'
+            $discountValidator: '@App\Service\Promotion\Action\DiscountValidation\ChainDiscountValidator'
+        tags:
+            - { name: 'app.promotion.action_type' }
+
+    App\Validator\Promotion\PromotionSubjectCouponValidator:
+        arguments:
+            - '@App\Service\Promotion\Eligibility\ChainPromotionEligibilityChecker'
+        tags:
+            - { name: 'validator.constraint_validator' }
+
+

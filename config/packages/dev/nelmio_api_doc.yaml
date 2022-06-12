@@ -1,0 +1,35 @@
+nelmio_api_doc:
+    documentation:
+        components:
+            securitySchemes:
+                Bearer:
+                    type: apiKey
+                    description: 'Value: Bearer {jwt}'
+                    name: Authorization
+                    in: header
+        security:
+            -   Bearer: []
+        info:
+            title: Timcheh
+            description: Amazing new-generation ecommerce website!
+            version: 1.0.0
+    areas: # to filter documented areas
+        default:
+            path_patterns: [ ^/api ]
+            host_patterns: [ ^api\. ]
+
+        admin:
+            path_patterns: [ ^/admin ]
+
+        seller:
+            path_patterns: [ ^/seller/ ]
+
+        carrier:
+            path_patterns: [ ^/carrier/ ]
+
+        landing:
+            path_patterns: [ ^/landing ]
+
+        customer:
+            path_patterns:
+                - ^((?!/admin|/seller/|/carrier|/landing|/_profiler|/_wdt|_error|/doc).)*$

@@ -1,0 +1,9 @@
+presta_sitemap:
+  items_by_set: 25000
+
+  route_annotation_listener: true
+
+  defaults:
+    priority: 1
+    changefreq: daily
+    lastmod: now
